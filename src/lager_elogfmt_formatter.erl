@@ -23,9 +23,9 @@ format(Msg, Config) ->
     Defaults = proplists:get_value(defaults, Config, []),
     Props = filter_undefined([{"app", App},
                               severity(Msg),
+                              meta(Msg, App) ++
                               msg(Msg) |
-                              Defaults ++
-                              meta(Msg, App)
+                              Defaults
                              ]),
     elogfmt_core:logmessage(Props) ++ "\n".
 
@@ -37,9 +37,12 @@ severity(Msg) ->
     Severity = lager_msg:severity(Msg),
     {"severity", atom_to_list(Severity)}.
 
+%% TODO filter Msg per some predicates?
 msg(Msg) ->
     Message = escape(lager_msg:message(Msg)),
     {"msg", ["\"", Message, "\""]}.
+
+
 
 meta(Msg, App) ->
     Meta = lager_msg:metadata(Msg),
